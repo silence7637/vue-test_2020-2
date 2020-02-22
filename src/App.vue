@@ -1,32 +1,28 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <router-view></router-view>
+    <TabBar v-show="$route.meta.showFooter"/><!--在配置路由时使用配置源数据meta来判断是否显示TabBar-->
   </div>
 </template>
 
-<style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
 
-#nav {
-  padding: 30px;
+  import TabBar from './components/Tab-Bar/Tab-Bar'
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+  export default {
 
-    &.router-link-exact-active {
-      color: #42b983;
+    components:{
+      TabBar
     }
+
   }
-}
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+#app
+  width 100%
+  height 100%
+  background-color: #f5f5f5;
+
 </style>
