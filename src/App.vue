@@ -8,11 +8,16 @@
 <script>
 
   import TabBar from './components/Tab-Bar/Tab-Bar'
+  
+  import {reqFoodTypes} from './api'
 
   export default {
 
     components:{
       TabBar
+    },
+   mounted() {
+      this.$store.dispatch('getAddress')
     }
 
   }

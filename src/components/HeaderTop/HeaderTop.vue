@@ -13,7 +13,8 @@
         name: "HeaderTop",
         props:{
             title:String
-        }
+        },
+
     }
 </script>
 
