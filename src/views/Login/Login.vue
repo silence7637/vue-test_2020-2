@@ -41,7 +41,7 @@
                             </section>
                             <section class="login_message">
                                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                                <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                                <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha" @click="getCaptcha" ref="captcha">
                             </section>
                         </section>
                     </div>
@@ -59,6 +59,8 @@
 </template>
 
 <script>
+    import {reqSendCode,reqSmsLogin,reqPwdLogin} from '../../api/index'
+
     import AlertTip from "../../components/AlertTip/AlertTip";
     export default {
         name: "Login",
@@ -90,14 +92,27 @@
                 //倒计时
                 if(this.time===0){
                     this.time = 30
-                    const intervalId = setInterval(()=>{
+                    this.intervalId = setInterval(()=>{
                         this.time--
                         if(this.time<=0){
-                            clearInterval(intervalId)
+                            clearInterval(this.intervalId)
                         }
                     },1000)
 
                     //发送验证码短信ajax请求
+                    reqSendCode(this.phone).then(res=>{
+                        if(res.code===1){//发送失败
+                            //显示提示
+                            this.showAlert(res.msg)
+                            //停止倒计时
+                            if(this.time){
+                                this.time = 0
+                                clearInterval(this.intervalId)
+                                this.intervalId = undefined
+                            }
+                        }
+                    })
+
                 }
 
             },
@@ -119,23 +134,84 @@
                     if(!this.rightPhone){
                         //提示手机号错误
                         this.showAlert('手机号不正确')
+                        return
                     } else if(!/^\d{6}$/.test(code)){
                         //验证码必须是六位数组
                         this.showAlert('验证码不正确')
+                        return;
                     }
+
+                    //发生ajax请求短信登录
+                    reqSmsLogin(phone,code).then(res=>{
+                        //停止倒计时
+                        if(this.time){
+                            this.time = 0
+                            clearInterval(this.intervalId)
+                            this.intervalId = undefined
+                        }
+                        if(res.code===0){
+                            const user = res.data
+                            //将user保存到state
+                            this.$store.dispatch('recordUser',user)
+                            //跳转路由去个人中心界面
+                            this.$router.replace('/profile')
+                        } else {//失败
+                            //显示新的图片验证码
+                            this.getCaptcha()
+                            //显示警告提示
+                            const msg = res.msg
+                            this.showAlert(msg)
+
+                        }
+                    })
+
                 } else {//密码登录
                     const {name,pwd,captcha} = this
                     if(!name){
                         //用户名必须指定
                         this.showAlert('用户名必须指定')
+                        return;
                     } else if(!pwd){
                         //密码必须指定
                         this.showAlert('密码不能为空')
+                        return;
                     } else if(!captcha){
                         //验证码必须指定
                         this.showAlert('验证码不正确')
+                        return;
                     }
+
+                    //发送ajax请求密码登录
+                    reqPwdLogin({name,pwd,captcha}).then(res=>{
+                        //停止倒计时
+                        if(this.time){
+                            this.time = 0
+                            clearInterval(this.intervalId)
+                            this.intervalId = undefined
+                        }
+
+                        if(res.code===0){
+                            const user = res.data
+                            //将user保存到state
+                            this.$store.dispatch('recordUser',user)
+                            //跳转路由去个人中心界面
+                            this.$router.replace('/profile')
+                        } else {//失败
+                            //显示新的图片验证码
+                            this.getCaptcha()
+                            //显示警告提示
+                            const msg = res.msg
+                            this.showAlert(msg)
+                        }
+                    })
+
                 }
+            },
+
+            //获取新的图片验证码
+            getCaptcha(){
+                //每次指定的src值要不同
+                this.$refs.captcha.src = 'http://localhost:4000/captcha?time='+Date.now()
             }
 
         }

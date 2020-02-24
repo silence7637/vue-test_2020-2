@@ -8,6 +8,7 @@
 <script>
 
   import TabBar from './components/Tab-Bar/Tab-Bar'
+  import {mapActions} from 'vuex'
   
   import {reqFoodTypes} from './api'
 
@@ -18,8 +19,8 @@
     },
    mounted() {
       this.$store.dispatch('getAddress')
-    }
-
+      this.$store.dispatch('getUserInfo')
+    },
   }
 
 </script>

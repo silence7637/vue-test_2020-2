@@ -9,6 +9,10 @@ const Search =()=>import('../views/Search/Search')
 const Order =()=>import('../views/Order/Order')
 const Profile =()=>import('../views/Profile/Profile')
 const Login =()=>import('../views/Login/Login')
+const Shop =()=>import('../views/Shop/Shop')
+const ShopGoods =()=>import('../views/Shop/ShopGoods/ShopGoods')
+const ShopRating =()=>import('../views/Shop/ShopRating/ShopRating')
+const ShopInfo =()=>import('../views/Shop/ShopInfo/ShopInfo')
 
 const routes = [
     {
@@ -42,6 +46,28 @@ const routes = [
     {
       path:'/login',
       component:Login
+    },
+    {
+      path:'/shop',
+      component:Shop,
+      children:[
+          {
+              path:'/shop/goods',
+              component:ShopGoods
+          },
+          {
+              path:'/shop/info',
+              component:ShopInfo
+          },
+          {
+              path:'/shop/ratings',
+              component:ShopRating
+          },
+          {
+              path:'',
+              redirect:'/shop/goods'
+          }
+      ]
     },
     {
       path:'/',
